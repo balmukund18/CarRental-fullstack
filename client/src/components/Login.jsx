@@ -14,6 +14,33 @@ const Login = () => {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [showPassword, setShowPassword] = React.useState(false);
+    // Password strength state
+    const [passwordStrength, setPasswordStrength] = React.useState({
+      length: false,
+      uppercase: false,
+      lowercase: false,
+      number: false,
+      special: false,
+      score: 0,
+      label: "Very Weak"
+    });
+
+    // Password strength calculation
+    React.useEffect(() => {
+      const length = password.length >= 8;
+      const uppercase = /[A-Z]/.test(password);
+      const lowercase = /[a-z]/.test(password);
+      const number = /[0-9]/.test(password);
+      const special = /[^A-Za-z0-9]/.test(password);
+      const score = [length, uppercase, lowercase, number, special].filter(Boolean).length;
+      let label = "Very Weak";
+      if (score === 1) label = "Very Weak";
+      else if (score === 2) label = "Weak";
+      else if (score === 3) label = "Moderate";
+      else if (score === 4) label = "Strong";
+      else if (score === 5) label = "Very Strong";
+      setPasswordStrength({ length, uppercase, lowercase, number, special, score, label });
+    }, [password]);
 
     // Floating label focus/value states
     const [focus, setFocus] = React.useState({
@@ -25,6 +52,28 @@ const Login = () => {
     const onSubmitHandler = async (event)=>{
         try {
             event.preventDefault();
+            if (state === "register") {
+              if (!passwordStrength.length) {
+                toast.error("Password must be at least 8 characters long.");
+                return;
+              }
+              if (!passwordStrength.uppercase) {
+                toast.error("Password must contain at least one uppercase letter.");
+                return;
+              }
+              if (!passwordStrength.lowercase) {
+                toast.error("Password must contain at least one lowercase letter.");
+                return;
+              }
+              if (!passwordStrength.number) {
+                toast.error("Password must contain at least one number.");
+                return;
+              }
+              if (!passwordStrength.special) {
+                toast.error("Password must contain at least one special character.");
+                return;
+              }
+            }
             const {data} = await axios.post(`/api/user/${state}`, {name, email, password})
 
             if (data.success) {
@@ -109,6 +158,24 @@ const Login = () => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
+          {state === "register" && (
+            <div className="mt-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-gray-600 font-semibold">Password strength</span>
+                <span className="text-xs font-semibold" style={{ color: passwordStrength.score < 3 ? '#e53e3e' : passwordStrength.score < 5 ? '#d69e2e' : '#38a169' }}>{passwordStrength.label}</span>
+              </div>
+              <div className="w-full h-1.5 rounded bg-gray-200 mb-2">
+                <div style={{ width: `${(passwordStrength.score/5)*100}%`, background: passwordStrength.score < 3 ? '#e53e3e' : passwordStrength.score < 5 ? '#d69e2e' : '#38a169' }} className="h-1.5 rounded transition-all"></div>
+              </div>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li className="flex items-center gap-2"><span>{passwordStrength.length ? '✔️' : '✖️'}</span> At least 8 characters</li>
+                <li className="flex items-center gap-2"><span>{passwordStrength.uppercase ? '✔️' : '✖️'}</span> Contains uppercase letter</li>
+                <li className="flex items-center gap-2"><span>{passwordStrength.lowercase ? '✔️' : '✖️'}</span> Contains lowercase letter</li>
+                <li className="flex items-center gap-2"><span>{passwordStrength.number ? '✔️' : '✖️'}</span> Contains a number</li>
+                <li className="flex items-center gap-2"><span>{passwordStrength.special ? '✔️' : '✖️'}</span> Contains special character</li>
+              </ul>
+            </div>
+          )}
         </div>
         {state === "register" ? (
           <p className="text-sm text-gray-500 w-full text-left">
