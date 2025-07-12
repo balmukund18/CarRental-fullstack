@@ -89,7 +89,7 @@ Feel free to contribute! Open a pull request or report issues to help improve th
 
 ## 📜 License
 
-This project is open-source under the MIT License
+This project is open-source under the [MIT License](LICENSE).
 
 ## 📞 Contact
 
