@@ -70,17 +70,18 @@ npm run server
 
 ```bash
 # Navigate to the client directory
-cd ../client
+cd CarRental-fullstack/client
 
 # Install frontend dependencies
 npm install
 
 # Create a .env file in the /client folder and add:
-# - VITE_CLERK_PUBLISHABLE_KEY
-# - VITE_BACKEND_URL
+# - VITE_CURRENCY
+# - VITE_BASE_URL
 
 # Start the React development server
 npm run dev
+
 ```
 ## 👥 Contributors
 
